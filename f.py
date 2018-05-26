@@ -160,9 +160,10 @@ print({key: len(value) for key, value in histograms['test'].items()})
 
 n_histograms = sum([len(value) for value in histograms['train'].values()])
 
-#print(np.array([np.array(value) for value in histograms.values()]))
+# print(np.array([np.array(value) for value in histograms.values()]))
 X = np.concatenate(tuple([value for value in histograms['train'].values()]))
-y = np.concatenate(tuple([np.ones(histograms['train'][key].shape[0]) * classes[key] for key in histograms['train'].keys()]))
+y = np.concatenate(
+    tuple([np.ones(histograms['train'][key].shape[0]) * classes[key] for key in histograms['train'].keys()]))
 
 mean = np.mean(X)
 std = np.std(X)
@@ -173,9 +174,18 @@ print(X)
 print(np.mean(X))
 print(np.std(X))
 
-clf = svm.SVC(C=10000)
-clf.fit(X, y)
-print(clf)
+OVERWRITE_MODEL = False
+
+if not os.path.exists('model_' + str(N_CLUSTERS)) or OVERWRITE_MODEL:
+    clf = svm.SVC(C=10000)
+    clf.fit(X, y)
+    print(clf)
+
+    with open('model_' + str(N_CLUSTERS), 'wb') as f:
+        pickle.dump((clf, mean, std), f)
+else:
+    with open('model_' + str(N_CLUSTERS), 'rb') as f:
+        clf, mean, std = pickle.load(f)
 
 y_pred = clf.predict(X)
 print(y_pred)
