@@ -16,10 +16,10 @@ labels = { '18': 'Bloque 18',
 
 N_CLUSTERS = 350
 
-with open('kmeans_model_' + str(N_CLUSTERS), 'rb') as f:
+with open(os.path.dirname(__file__) + '/kmeans_model_' + str(N_CLUSTERS), 'rb') as f:
     kmeans = pickle.load(f)
 
-with open('model_' + str(N_CLUSTERS), 'rb') as f:
+with open(os.path.dirname(__file__) + '/model_' + str(N_CLUSTERS), 'rb') as f:
     clf, mean, std = pickle.load(f)
 
 def process(file):
