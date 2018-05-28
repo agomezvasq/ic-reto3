@@ -7,10 +7,9 @@ import shutil
 
 from sklearn import svm
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 import pickle
 
-import process
+from server.FlaskApp.FlaskApp import process
 
 labels = { '18': 'Bloque 18',
            '19': 'Bloque 19',
