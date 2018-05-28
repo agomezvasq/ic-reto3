@@ -10,6 +10,8 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import pickle
 
+import process
+
 labels = { '18': 'Bloque 18',
            '19': 'Bloque 19',
            '26 - Bloque admon': 'Bloque 26',
@@ -215,3 +217,39 @@ val_accuracy = np.sum(val_y == val_y_pred) / n_val_histograms
 print('Validation accuracy: ' + str(val_accuracy))
 test_accuracy = np.sum(test_y == test_y_pred) / n_test_histograms
 #print('Test accuracy: ' + str(test_accuracy))
+
+TEST = True
+
+if TEST:
+    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('image', 1280, 720)
+
+    for dir in os.listdir('val'):
+        for file in os.listdir('val/' + dir):
+            print(process.process('val/' + dir + '/' + file))
+
+            if False:
+                img = cv2.imread('val/' + dir + '/' + file)
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                sift = cv2.xfeatures2d.SIFT_create()
+                #print('val/' + dir + '/' + file)
+                keypoints, des = sift.detectAndCompute(gray, None)
+                # print(des)
+
+                clusters = kmeans.predict(des)
+                histogram, _ = np.histogram(clusters, bins=np.arange(N_CLUSTERS + 1))
+
+                x = (histogram - mean) / std
+
+                pred = clf.predict(np.array([x]))
+
+                pred_class = list(labels.keys())[int(pred[0])]
+                print(pred_class)
+                if pred_class != dir:
+
+                    img_keypoints = img.copy()
+                    cv2.drawKeypoints(img, keypoints, img_keypoints, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+                    cv2.imshow('image', img_keypoints)
+                    cv2.waitKey(0)
