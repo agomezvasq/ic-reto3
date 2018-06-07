@@ -2,12 +2,20 @@ import random
 
 import cv2
 import os
+
+import matplotlib
+matplotlib.use('TkAgg')
 import numpy as np
 import shutil
 
+import pandas as pd
+import seaborn as sn
+import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.cluster import KMeans
 import pickle
+
+from sklearn.metrics import confusion_matrix
 
 from server.FlaskApp.FlaskApp import process
 
@@ -201,6 +209,14 @@ val_X = (val_X - mean) / std
 
 val_y_pred = clf.predict(val_X)
 
+cm = confusion_matrix(val_y, val_y_pred)
+cm = cm / cm.astype(np.float).sum(axis=1)
+
+df_cm = pd.DataFrame(cm, index=list([labels[key] for key in histograms['val'].keys()]))
+plt.figure(figsize=(10,7))
+sn.heatmap(df_cm, annot=True)
+plt.show()
+
 n_test_histograms = sum([len(value) for value in histograms['test'].values()])
 
 test_X = np.concatenate(tuple([value for value in histograms['test'].values()]))
@@ -215,9 +231,9 @@ print('Training accuracy: ' + str(accuracy))
 val_accuracy = np.sum(val_y == val_y_pred) / n_val_histograms
 print('Validation accuracy: ' + str(val_accuracy))
 test_accuracy = np.sum(test_y == test_y_pred) / n_test_histograms
-#print('Test accuracy: ' + str(test_accuracy))
+print('Test accuracy: ' + str(test_accuracy))
 
-TEST = True
+TEST = False
 
 if TEST:
     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
